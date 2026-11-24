@@ -1,0 +1,4 @@
+# Valgfri: ægte Windows-vindue via Edge WebView2. Fejler den (fx på en helt ny
+# Python-version uden færdige pythonnet-pakker), bruger Agent Hub automatisk
+# Microsoft Edge i app-tilstand i stedet.
+pywebview>=5.0

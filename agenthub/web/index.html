@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Hub</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/build/three.module.js",
+        "three/addons/": "./vendor/three/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="app"></div>
+
+  <header id="topbar">
+    <div class="brand"><span class="logo">◆</span> Agent Hub</div>
+    <div class="chips">
+      <div class="chip"><span id="stat-work">0</span> arbejder</div>
+      <div class="chip" id="chip-wait"><span id="stat-wait">0</span> venter</div>
+      <div class="chip"><span id="stat-total">0</span> i alt</div>
+    </div>
+    <div class="actions">
+      <div id="conn"><span class="led"></span><span id="conn-text">Forbinder…</span></div>
+      <button id="btn-demo" title="Start/stop simulerede agenter">▶ Demo</button>
+      <button id="btn-sound" title="Lyd til/fra">🔔</button>
+      <button id="btn-panel" title="Vis/skjul panel (H)">☰</button>
+    </div>
+  </header>
+
+  <aside id="panel">
+    <h2>Agenter</h2>
+    <div id="cards"></div>
+  </aside>
+
+  <section id="log">
+    <div id="log-head"><span class="ttl">📜 Hændelser</span><span id="log-last"></span><span class="chev">▴</span></div>
+    <div id="log-rows"></div>
+  </section>
+
+  <div id="empty">
+    <div class="empty-card">
+      <div class="big">🥚</div>
+      <h3>Ingen agenter endnu</h3>
+      <p>Start Claude Code i et af dine projekter, så dukker en agent op her.<br>Eller se hubben i aktion med demoen.</p>
+      <button id="empty-demo">▶ Start demo</button>
+    </div>
+  </div>
+
+  <div id="toasts"></div>
+  <div id="hint">Træk: rotér · Scroll: zoom · Klik på agent: følg · Esc: oversigt · H: panel</div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

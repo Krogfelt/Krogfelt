@@ -24,8 +24,9 @@ function shadowed(o, cast = true, receive = true) {
 }
 
 export class World {
-  constructor(scene) {
+  constructor(scene, { shadowSize = 2048 } = {}) {
     this.scene = scene;
+    this.shadowSize = shadowSize;
     this.stations = [];
     this.buildSky();
     this.buildLights();
@@ -60,7 +61,7 @@ export class World {
     const sun = new THREE.DirectionalLight('#fff1dc', 1.9);
     sun.position.set(9, 16, 7);
     sun.castShadow = true;
-    sun.shadow.mapSize.set(2048, 2048);
+    sun.shadow.mapSize.set(this.shadowSize, this.shadowSize);
     const s = sun.shadow.camera;
     s.left = -17; s.right = 17; s.top = 17; s.bottom = -17; s.near = 1; s.far = 50;
     sun.shadow.bias = -0.0004;

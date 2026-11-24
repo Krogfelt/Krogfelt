@@ -11,14 +11,18 @@ import { World } from './world.js';
 import { AgentManager } from './agents.js';
 import { UI } from './ui.js';
 import { Connection, api } from './net.js';
+import { SimConnection } from './sim.js';
 
 const container = document.getElementById('app');
 const params = new URLSearchParams(location.search);
 const quality = params.get('quality') || 'high';
+// Preview: ingen backend – agenterne simuleres i browseren (fx delt side på claude.ai)
+const preview = !!window.AGENTHUB_PREVIEW || params.has('preview');
+const mobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 700;
 
 // ---------------------------------------------------------------- renderer
 const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: 'high-performance' });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === 'low' ? 1 : 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality === 'low' ? 1 : mobile ? 1.5 : 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -38,7 +42,9 @@ scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 scene.environmentIntensity = 0.3;
 
 const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 400);
-const HOME_CAM = new THREE.Vector3(0, 10.5, 19);
+// Smalle/høje skærme (mobil på højkant) skal have kameraet længere væk for at se hele hubben
+const homeCam = () => (camera.aspect < 0.8 ? new THREE.Vector3(0, 17, 30) : camera.aspect < 1.2 ? new THREE.Vector3(0, 13, 24) : new THREE.Vector3(0, 10.5, 19));
+let HOME_CAM = homeCam();
 const HOME_TARGET = new THREE.Vector3(0, 0.9, 0);
 camera.position.copy(HOME_CAM);
 
@@ -53,7 +59,7 @@ controls.enablePan = true;
 controls.autoRotateSpeed = 0.35;
 
 // ---------------------------------------------------------------- post-processing
-const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: quality === 'low' ? 0 : 4 });
+const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: quality === 'low' ? 0 : mobile ? 2 : 4 });
 const composer = new EffectComposer(renderer, rt);
 composer.addPass(new RenderPass(scene, camera));
 const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.42, 0.5, 1.35);
@@ -63,7 +69,7 @@ composer.setPixelRatio(renderer.getPixelRatio());
 composer.setSize(window.innerWidth, window.innerHeight);
 
 // ---------------------------------------------------------------- verden + agenter
-const world = new World(scene);
+const world = new World(scene, { shadowSize: mobile ? 1024 : 2048 });
 const ui = new UI({ onSelect: (id) => select(id), onDemo: (on) => toggleDemo(on) });
 const agents = new AgentManager(scene, world, { onSelect: (id) => select(id) });
 
@@ -104,11 +110,17 @@ labelRenderer.domElement.addEventListener('dblclick', () => select(null));
 
 // ---------------------------------------------------------------- netværk
 async function toggleDemo(on) {
+  if (preview) {
+    on ? conn.start() : conn.stop();
+    ui.setDemo(on);
+    return;
+  }
   const r = await api(on ? '/api/demo/start' : '/api/demo/stop');
   ui.setDemo(!!r.demo);
 }
 
-new Connection({
+const Conn = preview ? SimConnection : Connection;
+const conn = new Conn({
   onStatus: (ok) => ui.setConnected(ok),
   onMessage: (msg) => {
     switch (msg.type) {
@@ -166,6 +178,7 @@ window.addEventListener('resize', () => {
   const w = window.innerWidth, h = window.innerHeight;
   camera.aspect = w / h;
   camera.updateProjectionMatrix();
+  HOME_CAM = homeCam();
   renderer.setSize(w, h);
   composer.setSize(w, h);
   bloom.setSize(w, h);

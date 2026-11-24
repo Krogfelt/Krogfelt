@@ -107,3 +107,30 @@ body.panel-hidden #log { right: 14px; }
   .chips .chip:nth-child(3) { display: none; }
   #hint { display: none; }
 }
+
+/* Telefon: topbar øverst, agentkort som vandret strimmel over loggen */
+@media (max-width: 700px) {
+  #topbar { top: calc(8px + env(safe-area-inset-top, 0px)); left: max(8px, env(safe-area-inset-left, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); gap: 8px; padding: 8px 10px; flex-wrap: wrap; }
+  .brand { font-size: 16px; }
+  .chips { order: 3; flex-basis: 100%; gap: 6px; }
+  .chip { padding: 3px 9px; font-size: 12px; }
+  .actions { margin-left: auto; gap: 6px; }
+  .actions button { padding: 5px 9px; }
+  #conn-text { display: none; }
+  #panel { top: auto; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); left: max(8px, env(safe-area-inset-left, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); width: auto; padding: 8px; overflow-x: auto; overflow-y: hidden; }
+  body.panel-hidden #panel { transform: translateY(260px); }
+  #panel h2 { display: none; }
+  #cards { display: flex; gap: 8px; }
+  .card { flex: 0 0 200px; margin: 0; }
+  .card:hover { transform: none; }
+  #log { left: max(8px, env(safe-area-inset-left, 0px)); right: max(8px, env(safe-area-inset-right, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); }
+  body.panel-hidden #log { right: max(8px, env(safe-area-inset-right, 0px)); }
+  #toasts { top: calc(104px + env(safe-area-inset-top, 0px)); width: calc(100% - 32px); }
+  .tag .bubble { font-size: 11px; padding: 3px 7px; }
+  .tag .name { font-size: 11px; }
+  .empty-card { margin: -120px 16px 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip.alert, .card.waiting.perm, .tag.waiting .bubble, .empty-card .big { animation: none; }
+}
